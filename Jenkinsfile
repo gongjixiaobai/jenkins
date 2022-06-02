@@ -4,7 +4,7 @@ pipeline {
         stage('pull project') {
             steps {
                 echo '准备拉取代码'
-                checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], extensions: [], userRemoteConfigs: [[credentialsId: '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', url: 'https://github.com/gongjixiaobai/jenkins.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], extensions: [], userRemoteConfigs: [[credentialsId: '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', url: 'https://github.com/gongjixiaobai/jenkins.git']]])
                 echo '代码拉取成功'
             }
         }
