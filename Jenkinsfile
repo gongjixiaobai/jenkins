@@ -1,25 +1,27 @@
 pipeline {
-    agent any
-    stages {
-        stage('pull project') {
-            steps {
-                echo '准备拉取代码'
-                checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], extensions: [], userRemoteConfigs: [[credentialsId: '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', url: 'https://github.com/gongjixiaobai/jenkins.git']]])
-                echo '代码拉取成功'
-            }
-        }
-        stage('build project准备') {
-            steps {
-                echo '准备打包项目'
-                sh 'mvn clean package -Dmaven.test.skip=true'
-                echo '项目打包成功'
-                sh 'pwd'
-                echo '项目地址'
-            }
-        }
-        stage('删除容器') {
-            steps {
-                sh '''containerId=`docker ps -a | grep javaapplication | awk \'{print $1}\'`
+  agent any
+  stages {
+    stage('pull project') {
+      steps {
+        echo '准备拉取代码'
+        checkout([$class: 'GitSCM', branches: [[name: '*/${branch}']], extensions: [], userRemoteConfigs: [[credentialsId: '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', url: 'https://github.com/gongjixiaobai/jenkins.git']]])
+        echo '代码拉取成功'
+      }
+    }
+
+    stage('build project准备') {
+      steps {
+        echo '准备打包项目'
+        sh 'mvn clean package -Dmaven.test.skip=true'
+        echo '项目打包成功'
+        sh 'pwd'
+        echo '项目地址'
+      }
+    }
+
+    stage('删除容器') {
+      steps {
+        sh '''containerId=`docker ps -a | grep javaapplication | awk \'{print $1}\'`
                 echo "容器id : " ${containerId}
                 if [[ -n ${containerId} ]]
                   then
@@ -29,11 +31,12 @@ pipeline {
                     echo "暂无启动容器"
                 fi
                 '''
-            }
-        }
-        stage('docker制作镜像') {
-            steps {
-                sh '''contanerId=`docker images | grep -w javaapplication | grep -v / | awk \'{print $3}\'`
+      }
+    }
+
+    stage('docker制作镜像') {
+      steps {
+        sh '''contanerId=`docker images | grep -w javaapplication | grep -v / | awk \'{print $3}\'`
                 cd /home/projects
                 rm -rf *.jar
                 cp /root/.jenkins/workspace/java_pipeline/target/*.jar /home/projects
@@ -63,11 +66,12 @@ pipeline {
 
                 
                 '''
-            }
-        }
-        stage('制作docker-compose.yml') {
-            steps {
-                sh '''
+      }
+    }
+
+    stage('制作docker-compose.yml') {
+      steps {
+        sh '''
                 cd /home/projects
                 docker build -t javaapplication:1 .
                 echo "镜像制作成功"
@@ -86,11 +90,12 @@ pipeline {
                       - JAVA_OPTS=-Xms512m -Xmx512m -XX:+UseParallelOldGC
 
                 '''
-            }
-        }
-        stage('使用docker-compose发布镜像') {
-            steps {
-                sh '''
+      }
+    }
+
+    stage('使用docker-compose发布镜像') {
+      steps {
+        sh '''
                 cd /home/projects
                 docker-compose up -d
                 
@@ -102,8 +107,8 @@ pipeline {
                   else
                     echo "容器启动失败"
                 fi'''
-            }
-        }
-        
+      }
     }
+
+  }
 }
