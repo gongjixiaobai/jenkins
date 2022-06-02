@@ -9,7 +9,7 @@ pipeline {
       }
     }
 
-    stage('build project准备') {
+    stage('build project') {
       steps {
         echo '准备打包项目'
         sh 'mvn clean package -Dmaven.test.skip=true'
@@ -19,7 +19,7 @@ pipeline {
       }
     }
 
-    stage('删除容器') {
+    stage('delete container') {
       steps {
         sh '''containerId=`docker ps -a | grep javaapplication | awk \'{print $1}\'`
                 echo "容器id : " ${containerId}
@@ -34,7 +34,7 @@ pipeline {
       }
     }
 
-    stage('docker制作镜像') {
+    stage('buld docker') {
       steps {
         sh '''contanerId=`docker images | grep -w javaapplication | grep -v / | awk \'{print $3}\'`
                 cd /home/projects
@@ -69,7 +69,7 @@ pipeline {
       }
     }
 
-    stage('制作docker-compose.yml') {
+    stage('make image') {
       steps {
         sh '''
                 cd /home/projects
@@ -93,7 +93,7 @@ pipeline {
       }
     }
 
-    stage('使用docker-compose发布镜像') {
+    stage('publish') {
       steps {
         sh '''
                 cd /home/projects
